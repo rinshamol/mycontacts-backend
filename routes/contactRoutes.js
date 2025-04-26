@@ -1,24 +1,15 @@
-const express = require('express');
-const dotenv = require('dotenv').config();
+const express = require("express");
+const dotenv = require("dotenv").config();
 const router = express.Router();
+const {
+  getContacts,
+  createContact,
+  getContact,
+  updateContact,
+  deleteContact,
+} = require("../controllers/contactsController");
 
-router.route("/").get((req,res)=>{
-    res.status(200).json({msg:"Get all Contacts"});
-});
-
-router.route("/").post((req,res)=>{
-    res.status(200).json({msg:"Create Contacts"});
-});
-router.route("/:id").get((req,res)=>{
-    res.status(200).json({msg:`get Contact for ${req.params.id}`});
-});
-
-router.route("/:id").put((req,res)=>{
-    res.status(200).json({msg:`update Contact for ${req.params.id}`});
-});
-
-router.route("/:id").delete((req,res)=>{
-    res.status(200).json({msg:`Delete Contact for ${req.params.id}`});
-});
+router.route("/").get(getContacts).post(createContact);
+router.route("/:id").get(getContact).put(updateContact).delete(deleteContact);
 
 module.exports = router;
