@@ -1,29 +1,63 @@
-const getContacts = (req, res) => {
-  res.status(200).json({ msg: "Get all Contacts" });
-};
+const asyncHandler = require("express-async-handler");
+/** @type {import("mongoose").Model} */
+const Contact = require("../models/contactModel");
 
-const createContact = (req, res) => {
+const getContacts = asyncHandler(async (req, res) => {
+  console.log("Fetching contacts...");
+  const contacts = await Contact.find();
+  res.status(200).json(contacts);
+});
+
+const createContact = asyncHandler(async (req, res) => {
   console.log(req.body);
-  const { name, age, email } = req.body;
-  if (!name || !age || !email) {
+  const { name, email, phone } = req.body;
+  if (!name || !email || !phone) {
     res.status(400);
     throw new Error("All fields are mandatory");
   }
+  const contact = await Contact.create({
+    name,
+    email,
+    phone,
+  });
 
-  res.status(201).json({ msg: "Create contacts" });
-};
+  res.status(201).json(contact);
+});
 
-const getContact = (req, res) => {
-  res.status(202).json({ msg: `get Contact for ${req.params.id}` });
-};
+const getContact = asyncHandler(async (req, res) => {
+  const contact = await Contact.findById(req.params.id);
+  if (!contact) {
+    res.status(404);
+    throw new Error("Contact not found");
+  }
+  res.status(200).json(contact);
+});
 
-const updateContact = (req, res) => {
-  res.status(203).json({ msg: `update contact for ${req.params.id}` });
-};
+const updateContact = asyncHandler(async (req, res) => {
+  const contact = await Contact.findById(req.params.id);
+  if (!contact) {
+    res.status(404);
+    throw new Error("Contact not found");
+  }
 
-const deleteContact = (req, res) => {
-  res.status(202).json({ msg: `delete contact for ${req.params.id}` });
-};
+  const updatedContact = await Contact.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { new: true }
+  );
+
+  res.status(200).json(updatedContact);
+});
+
+const deleteContact = asyncHandler(async (req, res) => {
+  const contact = await Contact.findByIdAndDelete(req.params.id);
+  if (!contact) {
+    res.status(404);
+    throw new Error("Contact not found");
+  }
+
+  res.status(202).json(contact);
+});
 
 module.exports = {
   getContacts,
