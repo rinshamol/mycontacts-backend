@@ -1,10 +1,12 @@
 const asyncHandler = require("express-async-handler");
 /** @type {import("mongoose").Model} */
 const Contact = require("../models/contactModel");
+const { constants } = require("../constants");
 
 const getContacts = asyncHandler(async (req, res) => {
+  console.log("User ID:", req.user);
   console.log("Fetching contacts...");
-  const contacts = await Contact.find();
+  const contacts = await Contact.find({ user_id: req.user.id });
   res.status(200).json(contacts);
 });
 
@@ -19,6 +21,7 @@ const createContact = asyncHandler(async (req, res) => {
     name,
     email,
     phone,
+    user_id: req.user.id,
   });
 
   res.status(201).json(contact);
